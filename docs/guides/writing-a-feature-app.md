@@ -221,17 +221,23 @@ const myFeatureAppDefinition = {
 A DOM Feature App allows the use of other frontend technologies such as Vue.js
 or Angular, although it is placed on a web page using React. Its definition's
 `create` method returns a Feature App instance with an `attachTo` method that
-accepts a DOM container element:
+accepts a DOM container element.
+
+The `attachTo` method of a DOM Feature App can optionally return a `DetachFunction`. This function is called when the Feature App is no longer needed, typically in the `disconnectedCallback` lifecycle method of the container element. It allows the Feature App to perform any necessary cleanup in a similar fashion how `useEffect` works in React.
+
+Example for React:
 
 ```js
-const myFeatureAppDefinition = {
-  create(env) {
-    return {
-      attachTo(container) {
-        container.innerText = 'Foo';
-      },
-    };
-  },
+const featureAppDefinition = {
+  create: () => ({
+    attachTo(element){
+      element.replaceWith('Hello, World!');
+
+      return () => {
+        console.log('You can do a cleanup when element is detached');
+      };
+    },
+  }),
 };
 ```
 
