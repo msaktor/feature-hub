@@ -7,6 +7,8 @@ import {
   InternalFeatureAppContainer,
 } from './internal/internal-feature-app-container';
 
+export type DetachFunction = () => void;
+
 export interface BaseFeatureApp {
   /**
    * Client-side only: A Feature App can define a promise that is resolved when
@@ -41,7 +43,7 @@ export interface DomFeatureApp extends BaseFeatureApp {
    * @param container The container element to which the Feature App can attach
    * itself.
    */
-  attachTo(container: Element): void;
+  attachTo(container: Element): void | DetachFunction;
 }
 
 /**

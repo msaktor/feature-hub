@@ -7,6 +7,7 @@ import {
 import * as React from 'react';
 import {
   CustomFeatureAppRenderingParams,
+  DetachFunction,
   FeatureApp,
 } from '../feature-app-container';
 import {FeatureHubContextConsumerValue} from '../feature-hub-context';
@@ -195,6 +196,7 @@ export class InternalFeatureAppContainer<
   private mounted = false;
   private loadingPromiseHandled = false;
   private domFeatureAppAttached = false;
+  private detachFunction: DetachFunction | void = void 0;
 
   public componentDidCatch(error: unknown): void {
     this.handleError(error);
@@ -214,6 +216,14 @@ export class InternalFeatureAppContainer<
 
   public componentWillUnmount(): void {
     this.mounted = false;
+
+    if (this.detachFunction && typeof this.detachFunction === 'function') {
+      try {
+        this.detachFunction();
+      } catch (error) {
+        this.handleError(error);
+      }
+    }
 
     if (this.state && this.state.release) {
       try {
@@ -323,7 +333,7 @@ export class InternalFeatureAppContainer<
       isDomFeatureApp(this.state.featureApp)
     ) {
       try {
-        this.state.featureApp.attachTo(this.containerRef.current);
+        this.detachFunction = this.state.featureApp.attachTo(this.containerRef.current);
         this.domFeatureAppAttached = true;
       } catch (error) {
         this.componentDidCatch(error);
